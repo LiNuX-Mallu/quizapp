@@ -1,0 +1,11 @@
+{
+  "name": "quizapp",
+  "version": "1.0.0",
+  "description": "mini project (quiz web app)",
+  "main": "server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mohd shas",
+  "license": "ISC"
+}
