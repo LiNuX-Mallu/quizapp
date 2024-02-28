@@ -1,26 +1,38 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import axios from "../../instances/axios";
 
 interface Question {
-  q: string;
-  options: {
-    a: string;
-    b: string;
-    c: string;
-    d: string;
-  }
+  question: string;
   a: string;
+  b: string;
+  c: string;
+  d: string;
+  answer: string;
 }
 
 export function Main() {
-  const [question, setQuestion] = useState<Question | null>(null);
+  const [question, setQ] = useState<Question | null>(null);
+  const [preQ, setPreQ] = useState("");
 
-  useEffect(() => {
+  const ask = () => {
+    axios
+      .post("/new-question", {pre: preQ}, {headers: {'Content-Type': 'application/json'}})
+      .then((res) => {
+        if (res.status === 200) {
+          setQ(res.data);
+          setPreQ(preQ + ", "+res.data.question);
+        }
+      })
+      .catch(() => alert("Internal server error"));
+  };
 
-  }, []);
   return (
     <div className="select-none bg-gradient-to-br from-slate-400 to-slate-800 h-[100vh] flex justify-center items-between flex-col items-center overflow-hidden">
       <div className="bg-transparent mb-5 h-[10%] ps-10 pe-10 text-white w-[100%] flex flex-row justify-between items-center">
-        <button className="flex items-center justify-center font-semibold">
+        <button
+          onClick={ask}
+          className="flex items-center justify-center font-semibold"
+        >
           user124 &nbsp; <i className="fa-solid fa-user"></i>
         </button>
         <button className="flex items-center justify-center font-[Lexend]">
@@ -46,21 +58,21 @@ export function Main() {
         <div className="w-[100%] flex flex-col h-[40%] justify-center items-center overflow-hidden">
           <div className="bg-green-200 h-[60%] w-[70%] rounded-md flex justify-center items-center">
             <p className="font-[Lexend] text-green-900">
-              Who is the first prime minister of india?
+              {question ? question.question : ""}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-1 mt-1 w-[70%] h-[40%] overflow-hidden font-semibold">
-            <div className="bg-slate-200 rounded-md h-full w-full flex justify-center items-center text-gray-900">
-              {`a) Narendra Modi`}
+            <div className="bg-slate-200 rounded-md h-full w-full flex justify-start items-center text-gray-900">
+              &nbsp; {`a) ${question?.a}`}
             </div>
-            <div className="bg-slate-200 rounded-md h-full w-full flex justify-center items-center text-gray-900">
-              {`d) Narendra Modi`}
+            <div className="bg-slate-200 rounded-md h-full w-full flex justify-start items-center text-gray-900">
+              &nbsp; {`b) ${question?.b}`}
             </div>
-            <div className="bg-slate-200 rounded-md h-full w-full flex justify-center items-center text-gray-900">
-              {`c) Narendra Modi`}
+            <div className="bg-slate-200 rounded-md h-full w-full flex justify-start items-center text-gray-900">
+              &nbsp; {`c) ${question?.c}`}
             </div>
-            <div className="bg-slate-200 rounded-md h-full w-full flex justify-center items-center text-gray-900">
-              {`d) Narendra Modi`}
+            <div className="bg-slate-200 rounded-md h-full w-full flex justify-start items-center text-gray-900">
+              &nbsp; {`d) ${question?.d}`}
             </div>
           </div>
         </div>
