@@ -100,7 +100,7 @@ io.on("connection", async (socket: Socket) => {
       ID = Math.floor(Math.random() * 1e10)
         .toString()
         .padStart(10, "0");
-    } while (socket.rooms.has(ID));
+    } while (io.of("/").adapter.rooms.has(ID));
 
     socket.join(ID);
     io.to(ID).emit("recieveID", ID);
@@ -110,11 +110,18 @@ io.on("connection", async (socket: Socket) => {
     socket.leave(ID);
   });
 
-  socket.on("sendRequest", (id: string) => {
-    if (!socket.rooms.has(id)) return;
+  socket.on("sendRequest", (data: {ID: string, friend: string}) => {
+	if (data.friend !== null) {
+		if (io.of("/").adapter.rooms.has(data.friend)) {
+			io.to(data.friend).emit('receiveRequest', data.ID);
+		} else {
+			io.to(data.ID).emit('receiveError', 404);
+		}
+		return;
+	}
     io.of("/").adapter.rooms.forEach((_, key) => {
-      if (key !== id && Number(key)) {
-        io.to(key).emit("receiveRequest", id);
+      if (key !== data.ID && Number(key)) {
+        io.to(key).emit("receiveRequest", data.ID);
       }
     });
   });

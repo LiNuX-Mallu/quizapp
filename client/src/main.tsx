@@ -4,6 +4,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { ContextID } from "./store/context.ts";
 import socket from "./instances/socket.ts";
+import Swal from "sweetalert2";
 
 export function WrapComponent() {
   const [ID, setID] = useState<string | null>(null);
@@ -15,16 +16,34 @@ export function WrapComponent() {
     setID(id);
   }
 
+  function receiveError(code: number) {
+    if (Swal.isVisible()) Swal.close();
+    let text = "Something went wrong";
+    switch (code) {
+      case 404:
+        text = "Invalid ID";
+    }
+    Swal.fire({
+      icon: "error",
+      title: text,
+      backdrop: true,
+    });
+  }
+
   useEffect(() => {
     setTimeout(() => {
       socket.emit("joinID");
     }, 1000);
+
     socket.on("recieveID", recieveID);
   }, [socketConnected]);
 
   useEffect(() => {
+    socket.on("receiveError", receiveError);
+
     return () => {
       if (ID) socket.emit("leaveID", ID);
+      socket.off("receiveError", receiveError);
       socket.off("recieveID", recieveID);
     };
   }, [ID]);

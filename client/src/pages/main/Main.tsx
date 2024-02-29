@@ -1,8 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import axios from "../../instances/axios";
 import { ContextID } from "../../store/context";
-import socket from "../../instances/socket";
-import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 interface Question {
   question: string;
@@ -16,7 +15,8 @@ interface Question {
 export function Main() {
   const [question, setQ] = useState<Question | null>(null);
   const [preQ, setPreQ] = useState("");
-  const { ID, oppID, setOppID } = useContext(ContextID);
+  const { oppID, setOppID } = useContext(ContextID);
+  const navigate = useNavigate();
 
   const ask = () => {
     axios
@@ -29,34 +29,16 @@ export function Main() {
         if (res.status === 200) {
           setQ(res.data);
           setPreQ(preQ + ", " + res.data.question);
+          console.log(res.data.question);
         }
       })
       .catch(() => alert("Internal server error"));
   };
 
-
-  useEffect(() => {
-    if (oppID) return;
-    Swal.fire({
-      didOpen: () => {
-        Swal.showLoading();
-      },
-      background: "transparent",
-      backdrop: true,
-    });
-
-    function receiveAcceptance(id: string) {
-      setOppID(id);
-    }
-
-    socket.on("receiveAccept", receiveAcceptance);
-    socket.emit("sendRequest", ID);
-
-    return () => {
-      socket.off("receiveAcceptance", receiveAcceptance);
-      Swal.close();
-    };
-  }, [oppID, ID, setOppID]);
+  const exit = () => {
+    navigate("/");
+    setOppID(null);
+  };
 
   return (
     <div className="select-none bg-gradient-to-br from-slate-400 to-slate-800 h-[100vh] flex justify-center items-between flex-col items-center overflow-hidden">
@@ -67,7 +49,10 @@ export function Main() {
         >
           <i className="fa-solid fa-user"></i>&nbsp;{oppID ?? "Looking..."}
         </button>
-        <button className="flex items-center justify-center font-[Lexend]">
+        <button
+          onClick={exit}
+          className="flex items-center justify-center font-[Lexend]"
+        >
           Exit &nbsp; <i className="fa-solid fa-right-from-bracket"></i>
         </button>
       </div>
@@ -89,10 +74,10 @@ export function Main() {
 
         <div className="w-[100%] flex flex-col h-[40%] justify-center items-center overflow-hidden">
           <div className="bg-green-200 h-[60%] w-[70%] rounded-md flex justify-center items-center">
-            <p className="font-[Lexend] text-green-900">
+            <p className="font-[Lexend] text-green-900 p-5 text-center">
               {question?.question
                 ? question?.question
-                : "Question will be here"}
+                : "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-1 mt-1 w-[70%] h-[40%] overflow-hidden font-semibold">
