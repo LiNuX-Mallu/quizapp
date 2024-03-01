@@ -13,7 +13,7 @@ export function Home() {
     function receiveRequest(id: string) {
       if (id === ID) return;
       Swal.fire({
-        title: `User [${id}] looking for partner`,
+        text: `User ${id} looking for a pair`,
         showCancelButton: true,
         showConfirmButton: true,
         confirmButtonText: "Accept",
@@ -41,7 +41,10 @@ export function Home() {
       didOpen: () => {
         Swal.showLoading();
       },
-      background: "transparent",
+      text:
+        friend === null
+          ? "Looking for a player..."
+          : "Waiting for friend to accept...",
       backdrop: true,
       allowOutsideClick: false,
     });
@@ -51,11 +54,11 @@ export function Home() {
       timeOut = setTimeout(() => {
         Swal.fire({
           icon: "info",
-          title: "Sorry! we couldn't find any players",
+          text: "Sorry! we couldn't find any players",
           backdrop: true,
         });
       }, 5000);
-    } 
+    }
 
     async function receiveAcceptance(id: string) {
       clearTimeout(timeOut);
@@ -93,7 +96,9 @@ export function Home() {
   return (
     <div className="select-none bg-gradient-to-bl from-slate-50 to-slate-600 h-[100vh] flex justify-center items-center">
       <div className="bg-white h-[100vh] w-[100%] md:w-[30%] md:h-[80%] rounded-md flex justify-between flex-col items-stretch p-3 pt-10">
-        <h1 className="text-center text-5xl text-gray-500 font-bold">Quiz</h1>
+        <h1 className="text-center text-5xl text-gray-500 font-semibold">
+          <i className="fa-solid fa-bounce">Q</i>uiz
+        </h1>
         <button
           onClick={copyID}
           className="font-semibold text-gray-600 flex items-center justify-center gap-2 group"

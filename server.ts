@@ -115,7 +115,7 @@ io.on("connection", async (socket: Socket) => {
 		if (io.of("/").adapter.rooms.has(data.friend)) {
 			io.to(data.friend).emit('receiveRequest', data.ID);
 		} else {
-			io.to(data.ID).emit('receiveError', 404);
+			io.to(data.ID).emit('receiveAlert', 404);
 		}
 		return;
 	}
@@ -131,6 +131,11 @@ io.on("connection", async (socket: Socket) => {
     	io.to(data.to).emit("receiveAccept", data.from);
 	}
   });
+  socket.on('alertExit', (data: {from: string, to: string}) => {
+    if (data.from && data.to) {
+      io.to(data.to).emit('receiveExit', data.from);
+    }
+  })
 });
 
 //server running

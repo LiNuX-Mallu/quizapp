@@ -1,7 +1,9 @@
-import { useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import axios from "../../instances/axios";
 import { ContextID } from "../../store/context";
 import { useNavigate } from "react-router-dom";
+import socket from "../../instances/socket";
+import Swal from "sweetalert2";
 
 interface Question {
   question: string;
@@ -15,7 +17,7 @@ interface Question {
 export function Main() {
   const [question, setQ] = useState<Question | null>(null);
   const [preQ, setPreQ] = useState("");
-  const { oppID, setOppID } = useContext(ContextID);
+  const { oppID, setOppID, ID } = useContext(ContextID);
   const navigate = useNavigate();
 
   const ask = () => {
@@ -35,10 +37,27 @@ export function Main() {
       .catch(() => alert("Internal server error"));
   };
 
-  const exit = () => {
-    navigate("/");
-    setOppID(null);
-  };
+  const receiveExit = useCallback((id: string) => {
+    if (id !== oppID) return;
+    Swal.fire({
+      title: 'You won!',
+      text: "Opponent left the game",
+      icon: 'warning',
+      iconHtml: '<i class="fa-solid fa-trophy" style="color: #FFD43B;"></i>',
+    })
+    .then(() => {
+      setOppID(null);
+      navigate('/');
+    })
+  }, [navigate, oppID, setOppID]);
+
+  useEffect(() => {
+    socket.on('receiveExit', receiveExit);
+
+    return () => {
+      socket.off('receiveExit', receiveExit);
+    }
+  }, [ID, oppID, receiveExit]);
 
   return (
     <div className="select-none bg-gradient-to-br from-slate-400 to-slate-800 h-[100vh] flex justify-center items-between flex-col items-center overflow-hidden">
@@ -50,7 +69,11 @@ export function Main() {
           <i className="fa-solid fa-user"></i>&nbsp;{oppID ?? "Looking..."}
         </button>
         <button
-          onClick={exit}
+          onClick={() => {
+            socket.emit('alertExit', {from: ID, to: oppID});
+            setOppID(null)
+            navigate('/')
+          }}
           className="flex items-center justify-center font-[Lexend]"
         >
           Exit &nbsp; <i className="fa-solid fa-right-from-bracket"></i>

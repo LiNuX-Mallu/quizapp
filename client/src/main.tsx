@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
@@ -16,19 +16,22 @@ export function WrapComponent() {
     setID(id);
   }
 
-  function receiveError(code: number) {
+  const receiveAlert = useCallback(function (code: number) {
     if (Swal.isVisible()) Swal.close();
-    let text = "Something went wrong";
+    let text: string;
     switch (code) {
       case 404:
         text = "Invalid ID";
+        break;
+      default:
+        text = "Something went wrong";
     }
     Swal.fire({
       icon: "error",
       title: text,
       backdrop: true,
     });
-  }
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -39,14 +42,14 @@ export function WrapComponent() {
   }, [socketConnected]);
 
   useEffect(() => {
-    socket.on("receiveError", receiveError);
+    socket.on("receiveAlert", receiveAlert);
 
     return () => {
       if (ID) socket.emit("leaveID", ID);
-      socket.off("receiveError", receiveError);
+      socket.off("receiveError", receiveAlert);
       socket.off("recieveID", recieveID);
     };
-  }, [ID]);
+  }, [ID, receiveAlert]);
 
   return (
     <ContextID.Provider value={{ ID, setID, oppID, setOppID }}>
