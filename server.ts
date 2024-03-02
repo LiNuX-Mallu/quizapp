@@ -9,13 +9,14 @@ import path from "path";
 import Ai from "openai";
 
 dotenv.config();
-let { PORT, HOST, CLIENT_PORT, CLIENT_HOST, OPENAI_API } = process.env;
+let { PORT, HOST, CLIENT_PORT, CLIENT_HOST, OPENAI_API, DOMAIN } = process.env;
 
 const app = express();
 
 const allowedOrigins = [
   `http://${HOST}:${PORT}`,
   `http://${CLIENT_HOST}:${CLIENT_PORT}`,
+   DOMAIN,
 ];
 
 const corsOptions: CorsOptions = {
