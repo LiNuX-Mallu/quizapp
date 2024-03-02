@@ -34,7 +34,7 @@ RUN npm run build
 WORKDIR /
 
 ENV HOST 0.0.0.0
-EXPOSE 8082
+EXPOSE 8080
 
 # Specify the command to run when the container starts
 CMD ["npm", "start"]

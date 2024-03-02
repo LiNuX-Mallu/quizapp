@@ -173,8 +173,8 @@ io.on("connection", async (socket: Socket) => {
 
 //server running
 server.listen(
-  typeof PORT === "number" ? PORT : 3000,
-  HOST ?? "localhost",
+  typeof PORT === "number" ? PORT : 8080,
+  HOST ?? "0.0.0.0",
   () => {
     console.log(`Server listening at http://${HOST}:${PORT}`);
   }
