@@ -7,6 +7,7 @@ import { Server, Socket } from "socket.io";
 import http from "http";
 import path from "path";
 import Ai from "openai";
+import topicHelper from './topicHelper';
 
 dotenv.config();
 let { PORT, HOST, CLIENT_PORT, CLIENT_HOST, OPENAI_API, DOMAIN } = process.env;
@@ -70,11 +71,19 @@ async function generateQuestions() {
   const ai = new Ai({
     apiKey: OPENAI_API,
   });
+  const topics = topicHelper();
   try {
-    const pre: string[] = [];
-    const content = `Please provide a JSON stringfied array of 5 quiz response with properties {question: question string, a: option a string, b: option b string, c: option c string, d: option d string, answer: option string} Make sure you only send the json string as response within the format i mentioned, because i will directly JSON parse it. Be interconnected; do not send duplicate response. do not send anything other than the quizz object. In addition make sure not to ask these questions [${pre}], make sure it have 5 questions`;
+    const content =
+      `Please provide a JSON stringfied array of 5 quiz response with properties - {question: question string, a: option a string, b: option b string, c: option c string, d: option d string, answer: option string}\n
+      * Important instructions are mentioned below - \n
+      * Each question should be from these topics - ${topics}.\n
+      * Make sure you only respond with the JSON stringfied data with the format I mentioned above, because I will directly JSON-parse it and I dont want convertion errors.\n
+      * Be interconnected and Do not send duplicate questions.\n
+      * Do not send any text other than the quizz object.\n
+    `;
+
     const chatCompletion = await ai.chat.completions.create({
-      messages: [{ role: "user", content }],
+      messages: [{ role: "system", content }],
       model: "gpt-3.5-turbo-0125",
     });
     if (chatCompletion?.choices[0]?.message?.content) {

@@ -46,66 +46,73 @@ export function Main() {
     score: number;
     attempt: number;
   }
-  const receiveScore = useCallback((game: Record<string, Game>) => {
-    if (!oppID || !ID) return;
-    setGameScore({opp: game[oppID].score, me: game[ID].score});
-    if (game[oppID].attempt === 5 || game[ID].attempt === 5) {
-      if (game[oppID].score > game[ID].score) {
-        Swal.fire({
-          title: "Opponent won the game",
-          text: `OPP: ${game[oppID].score} | YOU: ${game[ID].score}`,
-          icon: "warning",
-          iconHtml: '<i class="fa-solid fa-face-sad-tear"></i>',
-        }).then(() => {
-          setOppID(null);
-          navigate("/");
-        });
-      } else if (game[oppID].score < game[ID].score) {
-        Swal.fire({
-          title: "You won the game",
-          text: `OPP: ${game[oppID].score} | YOU: ${game[ID].score}`,
-          icon: "warning",
-          iconHtml: '<i class="fa-solid fa-trophy" style="color: #FFD43B;"></i>',
-        }).then(() => {
-          setOppID(null);
-          navigate("/");
-        });
-      } else {
-        Swal.fire({
-          title: "It's a draw",
-          text: `OPP: ${game[oppID].score} | YOU: ${game[ID].score}`,
-          icon: "warning",
-          iconHtml: '<i class="fa-solid fa-exclamation"></i>',
-        }).then(() => {
-          setOppID(null);
-          navigate("/");
-        });
+  const receiveScore = useCallback(
+    (game: Record<string, Game>) => {
+      if (!oppID || !ID) return;
+      setGameScore({ opp: game[oppID].score, me: game[ID].score });
+      if (game[oppID].attempt === 5 || game[ID].attempt === 5) {
+        if (game[oppID].score > game[ID].score) {
+          Swal.fire({
+            title: "Opponent won the game",
+            text: `OPP: ${game[oppID].score} | YOU: ${game[ID].score}`,
+            icon: "warning",
+            iconHtml: '<i class="fa-solid fa-face-sad-tear"></i>',
+          }).then(() => {
+            setOppID(null);
+            navigate("/");
+          });
+        } else if (game[oppID].score < game[ID].score) {
+          Swal.fire({
+            title: "You won the game",
+            text: `OPP: ${game[oppID].score} | YOU: ${game[ID].score}`,
+            icon: "warning",
+            iconHtml:
+              '<i class="fa-solid fa-trophy" style="color: #FFD43B;"></i>',
+          }).then(() => {
+            setOppID(null);
+            navigate("/");
+          });
+        } else {
+          Swal.fire({
+            title: "It's a draw",
+            text: `OPP: ${game[oppID].score} | YOU: ${game[ID].score}`,
+            icon: "warning",
+            iconHtml: '<i class="fa-solid fa-exclamation"></i>',
+          }).then(() => {
+            setOppID(null);
+            navigate("/");
+          });
+        }
       }
-    }
-  }, [ID, oppID, setOppID, navigate])
+    },
+    [ID, oppID, setOppID, navigate]
+  );
 
   useEffect(() => {
     if (oppID === null) return navigate("/");
     socket.on("receiveExit", receiveExit);
     socket.on("receiveQuestions", receiveQuestions);
-    socket.on('receiveScore', receiveScore);
+    socket.on("receiveScore", receiveScore);
 
     return () => {
       socket.off("receiveExit", receiveExit);
       socket.off("receiveQuestions", receiveQuestions);
-      socket.off('receiveScore', receiveScore);
+      socket.off("receiveScore", receiveScore);
     };
   }, [ID, oppID, receiveExit, navigate, receiveScore]);
 
-  const handleAnswer = (option: string, e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleAnswer = (
+    option: string,
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     const target = e.target as HTMLElement;
     const color = target.style.backgroundColor;
     if (questions && option === questions[qIndex].answer) {
       target.style.backgroundColor = "green";
-      socket.emit('sendScore', {scored: true, from: ID, to: oppID});
+      socket.emit("sendScore", { scored: true, from: ID, to: oppID });
     } else {
       target.style.backgroundColor = "red";
-      socket.emit('sendScore', {scored: false, from: ID, to: oppID});
+      socket.emit("sendScore", { scored: false, from: ID, to: oppID });
     }
     if (qIndex < 4) {
       setTimeout(() => {
@@ -172,9 +179,9 @@ export function Main() {
       )}
 
       {questions && (
-        <div className="w-[100%] flex flex-col h-[100%] justify-end items-center overflow-hidden pb-5">
+        <div className="w-[100%] lg:w-[75%] flex flex-col h-[100%] justify-end items-center overflow-hidden pb-5">
           <div className="bg-green-200 h-fit w-[70%] rounded-md flex justify-center items-center">
-            <p className="font-[Lexend] text-sm text-green-900 p-5 text-center">
+            <p className="font-[Lexend] text-md text-green-900 p-5 text-center">
               {questions[qIndex].question
                 ? questions[qIndex].question
                 : "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"}
@@ -183,27 +190,27 @@ export function Main() {
           <div className="grid grid-cols-2 gap-1 mt-1 w-[70%] overflow-hidden font-semibold">
             <div
               onClick={(e) => handleAnswer("a", e)}
-              className="bg-slate-200 rounded-md h-full w-full flex justify-start items-center text-gray-900 hover:bg-yellow-200"
+              className="text-center text-sm bg-slate-200 rounded-md h-full w-full flex justify-center p-1 items-center text-gray-900 hover:bg-yellow-200"
             >
-              &nbsp; {`a) ${questions[qIndex].a ?? "option a"}`}
+              &nbsp; {`${questions[qIndex].a ?? "option a"}`}
             </div>
             <div
               onClick={(e) => handleAnswer("b", e)}
-              className="bg-slate-200 rounded-md h-full w-full flex justify-start items-center text-gray-900 hover:bg-yellow-200"
+              className="bg-slate-200 text-sm text-center rounded-md h-full w-full flex justify-center p-1 items-center text-gray-900 hover:bg-yellow-200"
             >
-              &nbsp; {`b) ${questions[qIndex].b ?? "option b"}`}
+              &nbsp; {`${questions[qIndex].b ?? "option b"}`}
             </div>
             <div
               onClick={(e) => handleAnswer("c", e)}
-              className="bg-slate-200 rounded-md h-full w-full flex justify-start items-center text-gray-900 hover:bg-yellow-200"
+              className="p-1 bg-slate-200 text-sm text-center rounded-md h-full w-full flex justify-center items-center text-gray-900 hover:bg-yellow-200"
             >
-              &nbsp; {`c) ${questions[qIndex].c ?? "option c"}`}
+              &nbsp; {`${questions[qIndex].c ?? "option c"}`}
             </div>
             <div
               onClick={(e) => handleAnswer("d", e)}
-              className="bg-slate-200 rounded-md h-full w-full flex justify-start items-center text-gray-900 hover:bg-yellow-200"
+              className="p-1 bg-slate-200 text-sm text-center rounded-md h-full w-full flex justify-center items-center text-gray-900 hover:bg-yellow-200"
             >
-              &nbsp; {`d) ${questions[qIndex].d ?? "option d"}`}
+              &nbsp; {`${questions[qIndex].d ?? "option d"}`}
             </div>
           </div>
         </div>
