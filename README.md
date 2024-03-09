@@ -32,10 +32,6 @@ Get into the game right away by visiting [QuizApp](https://quizapp-co5u5j43yq-de
 
 Feel inspired to contribute? Your ideas and contributions are welcome! Feel free to fork the project, make improvements, and submit pull requests. Let's make QuizApp even better, together.
 
-## License
-
-This project is open source and available under the MIT License. See the [LICENSE.md](LICENSE.md) file for more details.
-
 ## Acknowledgments
 
 - Special thanks to the GPT API for enabling the generation of diverse and challenging questions.
