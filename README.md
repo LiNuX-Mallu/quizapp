@@ -26,7 +26,7 @@ Get into the game right away by visiting [QuizApp](https://quizapp-co5u5j43yq-de
 - **Start a New Game:** Generate a unique game ID by starting a new game. You can share this ID with a friend or wait for an opponent to join your game.
 - **Join a Game:** If you have a game ID from a friend, use it to join the game and start playing immediately.
 - **Answer Questions:** Once the game starts, answer the questions as accurately and quickly as possible. Your score will depend on your speed and accuracy.
-- **Winning the Game:** The game concludes when any player answers all 5 questions. Scores are then tallied to declare the winner.
+- **Winning the Game:** The game concludes when any player attempts all 5 questions. Scores are then tallied to declare the winner.
 
 ## Contributing
 
