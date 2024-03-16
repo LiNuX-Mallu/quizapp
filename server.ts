@@ -103,6 +103,7 @@ interface Game {
 
 const game = <Record<string, Record<string, Game>>>{};
 io.on("connection", async (socket: Socket) => {
+  try {
   //join room
   socket.on("joinID", () => {
     let ID;
@@ -125,7 +126,7 @@ io.on("connection", async (socket: Socket) => {
   //send request
   socket.on("sendRequest", (data: { ID: string; friend: string }) => {
     if (data.friend !== null) {
-      if (io.of("/").adapter.rooms.has(data.friend)) {
+      if (io.of("/").adapter.rooms.has(data.friend) && data.ID !== data.friend) {
         io.to(data.friend).emit("receiveRequest", data.ID);
       } else {
         io.to(data.ID).emit("receiveAlert", 404);
@@ -143,7 +144,7 @@ io.on("connection", async (socket: Socket) => {
   socket.on("acceptRequest", (data: { from: string; to: string }) => {
     if (
       io.of("/").adapter.rooms.has(data.from) &&
-      io.of("/").adapter.rooms.has(data.from)
+      io.of("/").adapter.rooms.has(data.to) 
     ) {
       game[data.from] = {
         [data.from]: { score: 0, attempt: 0, started: false },
@@ -178,6 +179,9 @@ io.on("connection", async (socket: Socket) => {
       io.to(data.to).emit("receiveExit", data.from);
     }
   });
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 //server running

@@ -60,11 +60,11 @@ export function Home() {
       }, 5000);
     }
 
-    async function receiveAcceptance(id: string) {
+    function receiveAcceptance(id: string) {
       clearTimeout(timeOut);
       setOppID(id);
       Swal.close();
-      socket.off("receiveAcceptance", receiveAcceptance);
+      socket.off("receiveAccept", receiveAcceptance);
       navigate("/app");
       Swal.close();
     }
